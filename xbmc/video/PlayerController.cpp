@@ -28,6 +28,7 @@
 #include "utils/LangCodeExpander.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
+#include "interfaces/AnnouncementManager.h"
 
 CPlayerController::~CPlayerController() = default;
 
@@ -249,6 +250,11 @@ bool CPlayerController::OnAction(const CAction &action)
                                                    vs.m_CustomPixelRatio, vs.m_CustomVerticalShift,
                                                    vs.m_CustomNonLinStretch);
         ShowSlider(action.GetID(), 216, vs.m_CustomZoomAmount, 0.5f, 0.1f, 2.0f);
+
+        CVariant val;
+        val = (int)(CMediaSettings::GetInstance().GetCurrentVideoSettings().m_CustomZoomAmount * 100);
+        ANNOUNCEMENT::CAnnouncementManager::GetInstance().Announce(ANNOUNCEMENT::Player, "xbmc", "OnChangeZoom", val);
+
         return true;
       }
 
@@ -263,6 +269,11 @@ bool CPlayerController::OnAction(const CAction &action)
                                                    vs.m_CustomPixelRatio, vs.m_CustomVerticalShift,
                                                    vs.m_CustomNonLinStretch);
         ShowSlider(action.GetID(), 216, vs.m_CustomZoomAmount, 0.5f, 0.1f, 2.0f);
+
+        CVariant val;
+        val = (int)(CMediaSettings::GetInstance().GetCurrentVideoSettings().m_CustomZoomAmount * 100);
+        ANNOUNCEMENT::CAnnouncementManager::GetInstance().Announce(ANNOUNCEMENT::Player, "xbmc", "OnChangeZoom", val);
+
         return true;
       }
 

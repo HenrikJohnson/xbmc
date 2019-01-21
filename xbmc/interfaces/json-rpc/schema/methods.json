@@ -2432,6 +2432,16 @@
     ],
     "returns": "integer"
   },
+  "Application.SetZoom": {
+    "type": "method",
+    "description": "Set the current volume",
+    "transport": "Response",
+    "permission": "ControlPlayback",
+    "params": [
+      { "name": "zoom", "type": "integer", "minimum": 50, "maximum": 200, "required": true }
+    ],
+    "returns": "integer"
+  },
   "Application.SetMute": {
     "type": "method",
     "description": "Toggle mute/unmute",

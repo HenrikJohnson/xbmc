@@ -26,6 +26,17 @@
 <keymap>
   <global>
     <keyboard>
+      <b>NotifyAll(Remote,PlayTV)</b>
+      <e>NotifyAll(Remote,PlayMusic)</e>
+      <g>NotifyAll(Remote,PlayMovies)</g>
+      <f1>FullScreen</f1>
+
+      <f2>ShowVideoMenu</f2>
+      <f3>AudioNextLanguage</f3>
+      <f4>NextSubtitle</f4>
+      <f5>ActivateWindow(OSDVideoSettings)</f5>
+      <f6>ActivateWindow(OSDAudioSettings)</f6>
+
       <p>Play</p>
       <q>Queue</q>
       <f>FastForward</f>
@@ -61,8 +72,8 @@
       <c mod="longpress">Menu</c>
       <space>Pause</space>
       <x>Stop</x>
-      <period>SkipNext</period>
-      <comma>SkipPrevious</comma>
+      <period>NotifyAll(Remote,PlayNext)</period>
+      <comma>PlayerControl(previous)</comma>
       <tab>FullScreen</tab>
       <printscreen>Screenshot</printscreen>
       <s mod="ctrl">Screenshot</s>
@@ -96,18 +107,20 @@
       <end>LastPage</end>
       <power>ActivateWindow(ShutdownMenu)</power>
       <sleep>ActivateWindow(ShutdownMenu)</sleep>
-      <!-- PVR windows -->
+      <!-- PVR windows
       <e>ActivateWindow(TVGuide)</e>
       <epg>ActivateWindow(TVGuide)</epg>
       <h>ActivateWindow(TVChannels)</h>
       <j>ActivateWindow(RadioChannels)</j>
       <k>ActivateWindow(TVRecordings)</k>
       <b>ActivateWindow(TVTimers)</b>
-      <!-- PVR -->
+      
       <red>ActivateWindow(TVChannels)</red>
       <green>ActivateWindow(Videos)</green>
       <yellow>ActivateWindow(Music)</yellow>
       <blue>ActivateWindow(Pictures)</blue>
+      -->
+
       <!-- Multimedia keyboard keys -->
       <browser_back>Back</browser_back>
       <browser_forward/>
@@ -177,6 +190,7 @@
   <Home>
     <keyboard>
       <i>info</i>
+      <escape>Fullscreen</escape>
       <end mod="ctrl">ShutDown()</end>
       <backspace mod="longpress">ActivateWindow(ShutdownMenu)</backspace>
     </keyboard>
@@ -321,6 +335,8 @@
       <u>MoveItemUp</u>
       <d>MoveItemDown</d>
       <backspace mod="longpress">ActivateWindow(Home)</backspace>
+      <pageup>MoveItemUp</pageup>
+      <pagedown>MoveItemDown</pagedown>
     </keyboard>
   </MusicPlaylist>
   <MusicPlaylistEditor>
@@ -329,6 +345,8 @@
       <d>MoveItemDown</d>
       <delete>Delete</delete>
       <backspace mod="longpress">ActivateWindow(Home)</backspace>
+      <pageup>MoveItemUp</pageup>
+      <pagedown>MoveItemDown</pagedown>
     </keyboard>
   </MusicPlaylistEditor>
   <Music>
@@ -342,8 +360,6 @@
     <keyboard>
       <f>FastForward</f>
       <r>Rewind</r>
-      <period>StepForward</period>
-      <comma>StepBack</comma>
       <backspace>Fullscreen</backspace>
       <backspace mod="longpress">Stop</backspace>
       <browser_back>Fullscreen</browser_back>
@@ -443,10 +459,8 @@
     <keyboard>
       <f>FastForward</f>
       <r>Rewind</r>
-      <period>SkipNext</period>
-      <comma>SkipPrevious</comma>
-      <pageup>IncreaseRating</pageup>
-      <pagedown>DecreaseRating</pagedown>
+      <pageup>SkipNext</pageup>
+      <pagedown>SkipPrevious</pagedown>
       <backspace>Fullscreen</backspace>
       <backspace mod="longpress">Stop</backspace>
       <browser_back>Fullscreen</browser_back>
@@ -471,14 +485,13 @@
       <o>PlayerProcessInfo</o>
       <l>LockPreset</l>
       <escape>FullScreen</escape>
+      <c>ActivateWindow(MusicPlaylist)</c>
     </keyboard>
   </Visualisation>
   <MusicOSD>
     <keyboard>
       <f>FastForward</f>
       <r>Rewind</r>
-      <period>SkipNext</period>
-      <comma>SkipPrevious</comma>
       <m>Back</m>
       <menu>Back</menu>
       <i>Info</i>
@@ -493,8 +506,6 @@
     <keyboard>
       <f>FastForward</f>
       <r>Rewind</r>
-      <period>SkipNext</period>
-      <comma>SkipPrevious</comma>
       <m>Back</m>
       <i>Info</i>
       <o>PlayerProcessInfo</o>
@@ -603,6 +614,8 @@
       <delete>Delete</delete>
       <u>MoveItemUp</u>
       <d>MoveItemDown</d>
+      <pageup>MoveItemUp</pageup>
+      <pagedown>MoveItemDown</pagedown>
       <backspace mod="longpress">ActivateWindow(Home)</backspace>
     </keyboard>
   </VideoPlaylist>

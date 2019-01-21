@@ -91,6 +91,15 @@
     ],
     "returns": null
   },
+  "Player.OnZoomChanged": {
+    "type": "notification",
+    "description": "New zoom value.",
+    "params": [
+      { "name": "sender", "type": "string", "required": true },
+      { "name": "value", "type": "integer", "required": true }
+    ],
+    "returns": null
+  },
   "Player.OnSeek": {
     "type": "notification",
     "description": "The playback position has been changed. If there is no ID available extra information will be provided.",

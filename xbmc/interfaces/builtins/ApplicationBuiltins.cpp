@@ -23,9 +23,16 @@
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
+
+#include "interfaces/AnnouncementManager.h"
+#include "settings/DisplaySettings.h"
+#include "settings/MediaSettings.h"
+#include "dialogs/GUIDialogKaiToast.h"
+
 #include <stdlib.h>
 
 using namespace KODI::MESSAGING;
+using namespace ANNOUNCEMENT;
 
 /*! \brief Extract an archive.
  *  \param params The parameters
@@ -107,6 +114,23 @@ static int SetVolume(const std::vector<std::string>& params)
   return 0;
 }
 
+
+static int SetZoom(const std::vector<std::string>& params)
+{
+  float percentage = (float)strtod(params[0].c_str(), nullptr);
+
+  CMediaSettings::GetInstance().GetCurrentVideoSettings().m_CustomZoomAmount = percentage/100;
+  CMediaSettings::GetInstance().GetCurrentVideoSettings().m_ViewMode = ViewModeCustom;
+
+  g_application.m_pPlayer->SetRenderViewMode(ViewModeCustom);
+  
+  CVariant val;
+  val = (int)(CMediaSettings::GetInstance().GetCurrentVideoSettings().m_CustomZoomAmount * 100);
+  CAnnouncementManager::GetInstance().Announce(Player, "xbmc", "OnChangeZoom", val);
+
+  return 0;
+}
+
 /*! \brief Toggle debug info.
  *  \param params (ignored)
  */
@@ -181,6 +205,12 @@ static int WakeOnLAN(const std::vector<std::string>& params)
 ///     @param[in] showvolumebar         Add "showVolumeBar" to show volume bar (optional).
 ///   }
 ///   \table_row2_l{
+///     <b>`SetZoom(percent)`</b>
+///     ,
+///     Sets the zoom to the percentage specified.
+///     @param[in] percent               Zoom level.
+///   }
+///   \table_row2_l{
 ///     <b>`ToggleDebug`</b>
 ///     ,
 ///     Toggles debug mode on/off
@@ -207,6 +237,7 @@ CBuiltins::CommandMap CApplicationBuiltins::GetOperations() const
            {"mute", {"Mute the player", 0, Mute}},
            {"notifyall", {"Notify all connected clients", 2, NotifyAll}},
            {"setvolume", {"Set the current volume", 1, SetVolume}},
+           {"setzoom", {"Set the current zoom", 1, SetZoom}},
            {"toggledebug", {"Enables/disables debug mode", 0, ToggleDebug}},
            {"toggledpms", {"Toggle DPMS mode manually", 0, ToggleDPMS}},
            {"wakeonlan", {"Sends the wake-up packet to the broadcast address for the specified MAC address", 1, WakeOnLAN}}

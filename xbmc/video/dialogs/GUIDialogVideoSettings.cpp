@@ -30,6 +30,7 @@
 #include "utils/LangCodeExpander.h"
 #include "utils/StringUtils.h"
 #include "video/ViewModeSettings.h"
+#include "interfaces/AnnouncementManager.h"
 
 #define SETTING_VIDEO_VIEW_MODE           "video.viewmode"
 #define SETTING_VIDEO_ZOOM                "video.zoom"
@@ -114,8 +115,13 @@ void CGUIDialogVideoSettings::OnSettingChanged(std::shared_ptr<const CSetting> s
            settingId == SETTING_VIDEO_NONLIN_STRETCH)
   {
     CVideoSettings vs = g_application.GetAppPlayer().GetVideoSettings();
-    if (settingId == SETTING_VIDEO_ZOOM)
+    if (settingId == SETTING_VIDEO_ZOOM) {
       vs.m_CustomZoomAmount = static_cast<float>(std::static_pointer_cast<const CSettingNumber>(setting)->GetValue());
+
+      CVariant val;
+      val = (int)(CMediaSettings::GetInstance().GetCurrentVideoSettings().m_CustomZoomAmount * 100);
+      ANNOUNCEMENT::CAnnouncementManager::GetInstance().Announce(ANNOUNCEMENT::Player, "xbmc", "OnChangeZoom", val);
+    }
     else if (settingId == SETTING_VIDEO_VERTICAL_SHIFT)
       vs.m_CustomVerticalShift = static_cast<float>(std::static_pointer_cast<const CSettingNumber>(setting)->GetValue());
     else if (settingId == SETTING_VIDEO_PIXEL_RATIO)

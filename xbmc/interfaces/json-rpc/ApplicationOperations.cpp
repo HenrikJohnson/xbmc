@@ -18,10 +18,17 @@
 #include "utils/log.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
+
+#include "interfaces/AnnouncementManager.h"
+#include "settings/DisplaySettings.h"
+#include "settings/MediaSettings.h"
+#include "dialogs/GUIDialogKaiToast.h"
+
 #include <string.h>
 
 using namespace JSONRPC;
 using namespace KODI::MESSAGING;
+using namespace ANNOUNCEMENT;
 
 JSONRPC_STATUS CApplicationOperations::GetProperties(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
 {
@@ -82,6 +89,23 @@ JSONRPC_STATUS CApplicationOperations::SetVolume(const std::string &method, ITra
   return GetPropertyValue("volume", result);
 }
 
+JSONRPC_STATUS CApplicationOperations::SetZoom(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
+{
+  double percentage = parameterObject["zoom"].asInteger();
+
+  CMediaSettings::GetInstance().GetCurrentVideoSettings().m_CustomZoomAmount = percentage/100;
+  CMediaSettings::GetInstance().GetCurrentVideoSettings().m_ViewMode = ViewModeCustom;
+  g_application.m_pPlayer->SetRenderViewMode(ViewModeCustom);
+
+  CVariant val;
+  val = (int)(CMediaSettings::GetInstance().GetCurrentVideoSettings().m_CustomZoomAmount * 100);
+  CAnnouncementManager::GetInstance().Announce(Player, "xbmc", "OnChangeZoom", val);
+
+  return GetPropertyValue("zoom", result);
+}
+
+
+
 JSONRPC_STATUS CApplicationOperations::SetMute(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
 {
   if ((parameterObject["mute"].isString() && parameterObject["mute"].asString().compare("toggle") == 0) ||
@@ -107,6 +131,8 @@ JSONRPC_STATUS CApplicationOperations::GetPropertyValue(const std::string &prope
     result = g_application.IsMuted();
   else if (property == "name")
     result = CCompileInfo::GetAppName();
+  else if (property == "zoom")
+    result = int(CDisplaySettings::GetInstance().GetZoomAmount() * 100);
   else if (property == "version")
   {
     result = CVariant(CVariant::VariantTypeObject);

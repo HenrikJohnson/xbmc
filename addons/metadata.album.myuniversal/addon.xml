@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="metadata.album.myuniversal"
+       name="My Universal Album Scraper"
+       version="2.6.0"
+       provider-name="Olympia, Team Kodi">
+  <requires>
+    <import addon="xbmc.metadata" version="2.1.0"/>
+    <import addon="metadata.common.allmusic.com" version="3.1.0"/>
+    <import addon="metadata.common.fanart.tv" version="3.1.0"/>
+    <import addon="metadata.common.musicbrainz.org" version="2.0.2"/>
+    <import addon="metadata.common.theaudiodb.com" version="1.8.1"/>
+  </requires>
+  <extension point="xbmc.metadata.scraper.albums"
+             language="en"
+             library="albumuniversal.xml"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">My Universal Scraper for Albums</summary>
+    <description lang="en">This scraper collects information from the following supported sites: MusicBrainz, last.fm, allmusic.com and amazon.de, while grabs artwork from: fanart.tv, last.fm and allmusic.com. It can be set field by field that from which site you want that specific information.&#10;&#10;The initial search is always done on MusicBrainz. In case allmusic and/or amazon.de links are not added on the MusicBrainz site, fields from allmusic.com and/or amazon.de cannot be fetched (very easy to add those missing links though).</description>
+    <platform>all</platform>
+    <license>GPL v2.0</license>
+    <forum>http://forum.xbmc.org/showthread.php?tid=133547</forum>
+    <website></website>
+    <email></email>
+    <source></source>
+  </extension>
+</addon>
