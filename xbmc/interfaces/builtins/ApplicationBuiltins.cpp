@@ -119,14 +119,17 @@ static int SetZoom(const std::vector<std::string>& params)
 {
   float percentage = (float)strtod(params[0].c_str(), nullptr);
 
-  CMediaSettings::GetInstance().GetCurrentVideoSettings().m_CustomZoomAmount = percentage/100;
-  CMediaSettings::GetInstance().GetCurrentVideoSettings().m_ViewMode = ViewModeCustom;
+  CVideoSettings vs = g_application.GetAppPlayer().GetVideoSettings();
+  vs.m_CustomZoomAmount = percentage/100;
+  vs.m_ViewMode = ViewModeCustom;
 
-  g_application.m_pPlayer->SetRenderViewMode(ViewModeCustom);
+  g_application.GetAppPlayer().SetRenderViewMode(ViewModeCustom, vs.m_CustomZoomAmount,
+						 vs.m_CustomPixelRatio, vs.m_CustomVerticalShift,
+						 vs.m_CustomNonLinStretch);
   
   CVariant val;
-  val = (int)(CMediaSettings::GetInstance().GetCurrentVideoSettings().m_CustomZoomAmount * 100);
-  CAnnouncementManager::GetInstance().Announce(Player, "xbmc", "OnChangeZoom", val);
+  val = (int)(vs.m_CustomZoomAmount * 100);
+  CServiceBroker::GetAnnouncementManager()->Announce(Player, "xbmc", "OnChangeZoom", val);
 
   return 0;
 }

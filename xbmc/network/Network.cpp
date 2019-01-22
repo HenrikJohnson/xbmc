@@ -502,12 +502,6 @@ std::vector<SOCKET> CreateTCPServerSocket(const int port, const bool bindLocal, 
       closesocket(sock);
       CLog::Log(LOGERROR, "%s Server: Failed to set listen", callerName);
     }
-
-    int optval = 1;	
-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof (optval)) == SOCKET_ERROR) {
-      // Not a fatal error, but log all the same
-      CLog::Log(LOGERROR, "JSONRPC Server: Failed to set SO_REUSEADDR flag");
-    }
   }
   freeaddrinfo(results);
 
@@ -541,12 +535,6 @@ void CNetworkBase::WaitForNet()
     {
       CLog::Log(LOGNOTICE, "%s: A network interface is up after waiting %d ms", __FUNCTION__, i * intervalMs);
       return;
-    }
-
-    int optval = 1;	
-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof (optval)) == SOCKET_ERROR) {
-      // Not a fatal error, but log all the same
-      CLog::Log(LOGERROR, "JSONRPC Server: Failed to set SO_REUSEADDR flag");
     }
   }
 

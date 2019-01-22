@@ -118,9 +118,10 @@ void CGUIDialogVideoSettings::OnSettingChanged(std::shared_ptr<const CSetting> s
     if (settingId == SETTING_VIDEO_ZOOM) {
       vs.m_CustomZoomAmount = static_cast<float>(std::static_pointer_cast<const CSettingNumber>(setting)->GetValue());
 
+      CVideoSettings vs = g_application.GetAppPlayer().GetVideoSettings();
       CVariant val;
-      val = (int)(CMediaSettings::GetInstance().GetCurrentVideoSettings().m_CustomZoomAmount * 100);
-      ANNOUNCEMENT::CAnnouncementManager::GetInstance().Announce(ANNOUNCEMENT::Player, "xbmc", "OnChangeZoom", val);
+      val = (int)(vs.m_CustomZoomAmount * 100);
+      CServiceBroker::GetAnnouncementManager()->Announce(ANNOUNCEMENT::Player, "xbmc", "OnChangeZoom", val);
     }
     else if (settingId == SETTING_VIDEO_VERTICAL_SHIFT)
       vs.m_CustomVerticalShift = static_cast<float>(std::static_pointer_cast<const CSettingNumber>(setting)->GetValue());
