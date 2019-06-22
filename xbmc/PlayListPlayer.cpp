@@ -25,8 +25,10 @@
 #include "interfaces/AnnouncementManager.h"
 #include "input/Key.h"
 #include "URL.h"
+#include "utils/URIUtils.h"
 #include "messaging/ApplicationMessenger.h"
 #include "filesystem/VideoDatabaseFile.h"
+#include "filesystem/PluginDirectory.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "ServiceBroker.h"
 
@@ -523,6 +525,13 @@ void CPlayListPlayer::SetShuffle(int iPlaylist, bool bYesNo, bool bNotify /* = f
     }
   }
 
+  // its likely that the playlist changed   
+  if (CServiceBroker::GetGUI() != nullptr)
+  {
+    CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
+    CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+  }
+
   AnnouncePropertyChanged(iPlaylist, "shuffled", IsShuffled(iPlaylist));
 }
 
@@ -575,6 +584,14 @@ void CPlayListPlayer::SetRepeat(int iPlaylist, REPEAT_STATE state, bool bNotify 
     data = "off";
     break;
   }
+
+  // its likely that the playlist changed   
+  if (CServiceBroker::GetGUI() != nullptr)
+  {
+    CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
+    CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+  }
+
   AnnouncePropertyChanged(iPlaylist, "repeat", data);
 }
 
@@ -644,6 +661,10 @@ void CPlayListPlayer::Add(int iPlaylist, const CFileItemList& items)
   list.Add(items);
   if (list.IsShuffled())
     ReShuffle(iPlaylist, iSize);
+
+  // its likely that the playlist changed
+  CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
+  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
 }
 
 void CPlayListPlayer::Insert(int iPlaylist, const CPlayList& playlist, int iIndex)
@@ -683,6 +704,10 @@ void CPlayListPlayer::Insert(int iPlaylist, const CFileItemList& items, int iInd
     ReShuffle(iPlaylist, iSize);
   else if (m_iCurrentPlayList == iPlaylist && m_iCurrentSong >= iIndex)
     m_iCurrentSong++;
+
+  // its likely that the playlist changed
+  CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
+  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
 }
 
 void CPlayListPlayer::Remove(int iPlaylist, int iPosition)
@@ -869,6 +894,12 @@ void PLAYLIST::CPlayListPlayer::OnApplicationMessage(KODI::MESSAGING::ThreadMess
         if (list->Size() == 1 && !(*list)[0]->IsPlayList())
         {
           CFileItemPtr item = (*list)[0];
+          // if the item is a plugin we need to resolve the URL to ensure the infotags are filled.
+          // resolve only for a maximum of 5 times to avoid deadlocks (plugin:// paths can resolve to plugin:// paths)
+          for (int i = 0; URIUtils::IsPlugin(item->GetDynPath()) && i < 5; ++i)
+          {
+            XFILE::CPluginDirectory::GetPluginResult(item->GetDynPath(), *item, true);
+          }
           if (item->IsAudio() || item->IsVideo())
             Play(item, pMsg->strParam);
           else

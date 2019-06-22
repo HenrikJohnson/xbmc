@@ -103,7 +103,7 @@ void CAdvancedSettings::Initialize(const CAppParamParser &params, CSettingsManag
   params.SetAdvancedSettings(*this);
 
   settingsMgr.RegisterSettingOptionsFiller("loggingcomponents", SettingOptionsLoggingComponentsFiller);
-  settingsMgr.RegisterSettingsHandler(this);
+  settingsMgr.RegisterSettingsHandler(this, true);
   std::set<std::string> settingSet;
   settingSet.insert(CSettings::SETTING_DEBUG_SHOWLOGINFO);
   settingSet.insert(CSettings::SETTING_DEBUG_EXTRALOGGING);
@@ -173,7 +173,6 @@ void CAdvancedSettings::Initialize()
   m_DXVACheckCompatibility = false;
   m_DXVACheckCompatibilityPresent = false;
   m_DXVAForceProcessorRenderer = true;
-  m_DXVAAllowHqScaling = true;
   m_videoFpsDetect = 1;
   m_maxTempo = 1.55f;
   m_videoPreferStereoStream = false;
@@ -324,13 +323,30 @@ void CAdvancedSettings::Initialize()
   m_videoMovieSetExtraArt = {};
   m_videoMusicVideoExtraArt = {};
 
-  m_iEpgUpdateCheckInterval = 300; /* check if tables need to be updated every 5 minutes */
-  m_iEpgCleanupInterval = 900;     /* remove old entries from the EPG every 15 minutes */
-  m_iEpgActiveTagCheckInterval = 60; /* check for updated active tags every minute */
-  m_iEpgRetryInterruptedUpdateInterval = 30; /* retry an interrupted epg update after 30 seconds */
-  m_iEpgUpdateEmptyTagsInterval = 60; /* override user selectable EPG update interval for empty EPG tags */
-  m_bEpgDisplayUpdatePopup = true; /* display a progress popup while updating EPG data from clients */
-  m_bEpgDisplayIncrementalUpdatePopup = false; /* also display a progress popup while doing incremental EPG updates */
+  m_iEpgUpdateCheckInterval = 300; /* Check every X seconds, if EPG data need to be updated. This does not mean that
+                                      every X seconds an EPG update is actually triggered, it's just the interval how
+                                      often to check whether an update should be triggered. If this value is greater
+                                      than GUI setting 'epg.epgupdate' value, then EPG updates will done with the value
+                                      specified for 'updatecheckinterval', effectively overriding the GUI setting's value. */
+  m_iEpgCleanupInterval = 900; /* Remove old entries from the EPG every X seconds */
+  m_iEpgActiveTagCheckInterval = 60; /* Check for updated active tags every X seconds */
+  m_iEpgRetryInterruptedUpdateInterval = 30; /* Retry an interrupted EPG update after X seconds */
+  m_iEpgUpdateEmptyTagsInterval = 7200; /* If a TV channel has no EPG data, try to obtain data for that channel every
+                                           X seconds. This overrides the GUI setting 'epg.epgupdate' value, but only
+                                           for channels without EPG data. If this value is less than 'updatecheckinterval'
+                                           value, then data update will be done with the interval specified by
+                                           'updatecheckinterval'.
+                                           Example 1: epg.epgupdate = 120 (minutes!), updatecheckinterval = 300,
+                                                      updateemptytagsinterval = 60 => trigger an EPG update for every
+                                                      channel without EPG data every 5 minutes and trigger an EPG update
+                                                      for every channel with EPG data every 2 hours.
+                                           Example 2: epg.epgupdate = 120 (minutes!), updatecheckinterval = 300,
+                                                      updateemptytagsinterval = 3600 => trigger an EPG update for every
+                                                      channel without EPG data every 2 hours and trigger an EPG update
+                                                      for every channel with EPG data every 1 hour. */
+  m_bEpgDisplayUpdatePopup = true; /* Display a progress popup while updating EPG data from clients */
+  m_bEpgDisplayIncrementalUpdatePopup = false; /* Display a progress popup while doing incremental EPG updates, but
+                                                  only if 'displayupdatepopup' is also enabled. */
 
   m_bEdlMergeShortCommBreaks = false;      // Off by default
   m_iEdlMaxCommBreakLength = 8 * 30 + 10;  // Just over 8 * 30 second commercial break.
@@ -412,7 +428,7 @@ void CAdvancedSettings::Initialize()
   m_databaseVideo.Reset();
 
   m_pictureExtensions = ".png|.jpg|.jpeg|.bmp|.gif|.ico|.tif|.tiff|.tga|.pcx|.cbz|.zip|.rss|.webp|.jp2|.apng";
-  m_musicExtensions = ".nsv|.m4a|.flac|.aac|.strm|.pls|.rm|.rma|.mpa|.wav|.wma|.ogg|.mp3|.mp2|.m3u|.gdm|.imf|.m15|.sfx|.uni|.ac3|.dts|.cue|.aif|.aiff|.wpl|.xspf|.ape|.mac|.mpc|.mp+|.mpp|.shn|.zip|.wv|.dsp|.xsp|.xwav|.waa|.wvs|.wam|.gcm|.idsp|.mpdsp|.mss|.spt|.rsd|.sap|.cmc|.cmr|.dmc|.mpt|.mpd|.rmt|.tmc|.tm8|.tm2|.oga|.url|.pxml|.tta|.rss|.wtv|.mka|.tak|.opus|.dff|.dsf|.m4b";
+  m_musicExtensions = ".nsv|.m4a|.flac|.aac|.strm|.pls|.rm|.rma|.mpa|.wav|.wma|.ogg|.mp3|.mp2|.m3u|.gdm|.imf|.m15|.sfx|.uni|.ac3|.dts|.cue|.aif|.aiff|.wpl|.xspf|.ape|.mac|.mpc|.mp+|.mpp|.shn|.zip|.wv|.dsp|.xsp|.xwav|.waa|.wvs|.wam|.gcm|.idsp|.mpdsp|.mss|.spt|.rsd|.sap|.cmc|.cmr|.dmc|.mpt|.mpd|.rmt|.tmc|.tm8|.tm2|.oga|.url|.pxml|.tta|.rss|.wtv|.mka|.tak|.opus|.dff|.dsf|.m4b|.dtshd";
   m_videoExtensions = ".m4v|.3g2|.3gp|.nsv|.tp|.ts|.ty|.strm|.pls|.rm|.rmvb|.mpd|.m3u|.m3u8|.ifo|.mov|.qt|.divx|.xvid|.bivx|.vob|.nrg|.img|.iso|.udf|.pva|.wmv|.asf|.asx|.ogm|.m2v|.avi|.bin|.dat|.mpg|.mpeg|.mp4|.mkv|.mk3d|.avc|.vp3|.svq3|.nuv|.viv|.dv|.fli|.flv|.001|.wpl|.xspf|.zip|.vdr|.dvr-ms|.xsp|.mts|.m2t|.m2ts|.evo|.ogv|.sdp|.avs|.rec|.url|.pxml|.vc1|.h264|.rcv|.rss|.mpls|.webm|.bdmv|.wtv|.trp|.f4v";
   m_subtitlesExtensions = ".utf|.utf8|.utf-8|.sub|.srt|.smi|.rt|.txt|.ssa|.text|.ssa|.aqt|.jss|.ass|.idx|.ifo|.zip";
   m_discStubExtensions = ".disc";
@@ -718,7 +734,6 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
     m_DXVACheckCompatibilityPresent = XMLUtils::GetBoolean(pElement,"checkdxvacompatibility", m_DXVACheckCompatibility);
 
     XMLUtils::GetBoolean(pElement,"forcedxvarenderer", m_DXVAForceProcessorRenderer);
-    XMLUtils::GetBoolean(pElement, "dxvaallowhqscaling", m_DXVAAllowHqScaling);
     XMLUtils::GetBoolean(pElement, "usedisplaycontrolhwstereo", m_useDisplayControlHWStereo);
     XMLUtils::GetBoolean(pElement, "allowdiscretedecoder", m_allowUseSeparateDeviceForDecoding);
     //0 = disable fps detect, 1 = only detect on timestamps with uniform spacing, 2 detect on all timestamps
@@ -1034,10 +1049,10 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
     {
       std::string strFrom, strTo;
       TiXmlNode* pFrom = pSubstitute->FirstChild("from");
-      if (pFrom)
+      if (pFrom && !pFrom->NoChildren())
         strFrom = CSpecialProtocol::TranslatePath(pFrom->FirstChild()->Value()).c_str();
       TiXmlNode* pTo = pSubstitute->FirstChild("to");
-      if (pTo)
+      if (pTo && !pTo->NoChildren())
         strTo = pTo->FirstChild()->Value();
 
       if (!strFrom.empty() && !strTo.empty())
