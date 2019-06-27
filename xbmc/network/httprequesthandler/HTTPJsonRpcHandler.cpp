@@ -164,8 +164,7 @@ CHTTPJsonRpcHandler::CHTTPClient::CHTTPClient(HTTPMethod method)
   : m_permissionFlags(JSONRPC::ReadData)
 {
   // with a HTTP POST request everything is allowed
-  if (method == POST)
-    m_permissionFlags = JSONRPC::OPERATION_PERMISSION_ALL;
+  m_permissionFlags = JSONRPC::OPERATION_PERMISSION_ALL;
 }
 
 int CHTTPJsonRpcHandler::CHTTPClient::GetAnnouncementFlags()
