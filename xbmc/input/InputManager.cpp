@@ -467,7 +467,7 @@ bool CInputManager::OnKey(const CKey& key)
     }
     else
     {
-      if (!m_buttonTranslator->HasLongpressMapping(CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindowOrDialog(), key))
+      if (key.GetFromService() || !m_buttonTranslator->HasLongpressMapping(CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindowOrDialog(), key))
       {
         m_LastKey.Reset();
         bHandled = HandleKey(key);
